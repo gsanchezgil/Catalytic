@@ -102,8 +102,6 @@ impl Query {
         let idents = &self.idents;
 
         quote! {{
-            #(tracing::debug!("Used value {:#?} for {:#?} for upcoming query", #idents, stringify!(#idents));)*
-
             #ts
         }}
     }
