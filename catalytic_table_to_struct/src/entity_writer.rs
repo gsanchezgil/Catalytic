@@ -114,7 +114,7 @@ impl<T: Transformer> EntityWriter<'_, T> {
         self.struct_field_metadata
             .fields
             .iter()
-            .map(|f| format_ident!("{}", f.ident))
+            .map(|f| format_ident!("{}", f.field_name))
             .collect()
     }
 
@@ -131,7 +131,6 @@ impl<T: Transformer> EntityWriter<'_, T> {
 
     pub(crate) fn comma_separated_question_marks(&self, amount: usize) -> String {
         (0..amount)
-            .into_iter()
             .map(|_| "?".to_string())
             .collect::<Vec<_>>()
             .join(", ")
@@ -163,7 +162,7 @@ impl<T: Transformer> EntityWriter<'_, T> {
             .struct_field_metadata
             .primary_key_fields
             .iter()
-            .map(|f| format!("{} = ?", f.ident))
+            .map(|f| format!("{} = ?", f.column_name))
             .collect::<Vec<_>>()
             .join(" and ");
 

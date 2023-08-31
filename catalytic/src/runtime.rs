@@ -1,5 +1,6 @@
-use crate::env_property_reader::{database_url, keyspace};
+use crate::env_property_reader::{database_url, keyspace, password, username};
 use once_cell::sync::Lazy;
+use scylla::execution_profile::ExecutionProfileBuilder;
 use scylla::frame::types::Consistency;
 use scylla::frame::value::ValueList;
 use scylla::query::Query;
@@ -81,7 +82,13 @@ pub async fn create_connection() -> Session {
 
     let session = SessionBuilder::new()
         .known_node(database_url())
-        .default_consistency(Consistency::One)
+        .user(username(), password())
+        .default_execution_profile_handle(
+            ExecutionProfileBuilder::default()
+                .consistency(Consistency::One)
+                .build()
+                .into_handle(),
+        )
         .build()
         .await
         .unwrap();
