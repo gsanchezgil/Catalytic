@@ -171,7 +171,7 @@ pub async fn truncate(session: &CachingSession) -> ScyllaQueryResult {
 impl<'a> ChildRef<'a> {
     #[doc = r" Returns a struct that can perform an insert operation"]
     pub fn insert_qv(&self) -> Result<Insert, SerializeValuesError> {
-        let mut serialized = SerializedValues::with_capacity(4usize);
+        let mut serialized = SerializedValues::new();
         serialized.add_value(&self.birthday)?;
         serialized.add_value(&self.enum_json)?;
         serialized.add_value(&self.json)?;
@@ -188,7 +188,7 @@ impl<'a> ChildRef<'a> {
     }
     #[doc = r" Returns a struct that can perform an insert operation with a TTL"]
     pub fn insert_ttl_qv(&self, ttl: TtlType) -> Result<Insert, SerializeValuesError> {
-        let mut serialized = SerializedValues::with_capacity(5usize);
+        let mut serialized = SerializedValues::new();
         serialized.add_value(&self.birthday)?;
         serialized.add_value(&self.enum_json)?;
         serialized.add_value(&self.json)?;
@@ -277,7 +277,7 @@ impl From<PrimaryKeyRef<'_>> for PrimaryKey {
 impl PrimaryKeyRef<'_> {
     #[doc = r" Returns a struct that can perform a unique row selection"]
     pub fn select_unique_qv(&self) -> Result<SelectUnique<Child>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(1usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.birthday)?;
         Ok(SelectUnique::new(Qv {
             query: SELECT_UNIQUE_QUERY,
@@ -302,7 +302,7 @@ impl PrimaryKeyRef<'_> {
     pub fn select_unique_expect_qv(
         &self,
     ) -> Result<SelectUniqueExpect<Child>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(1usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.birthday)?;
         Ok(SelectUniqueExpect::new(Qv {
             query: SELECT_UNIQUE_QUERY,
@@ -328,7 +328,7 @@ impl PrimaryKeyRef<'_> {
         &self,
         val: &crate::MyJsonEnum,
     ) -> Result<Update, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(2usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&val)?;
         serialized_values.add_value(&self.birthday)?;
         Ok(Update::new(Qv {
@@ -354,7 +354,7 @@ impl PrimaryKeyRef<'_> {
 impl PrimaryKeyRef<'_> {
     #[doc = "Returns a struct that can perform an update operation for column json"]
     pub fn update_json_qv(&self, val: &crate::MyJsonType) -> Result<Update, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(2usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&val)?;
         serialized_values.add_value(&self.birthday)?;
         Ok(Update::new(Qv {
@@ -383,7 +383,7 @@ impl PrimaryKeyRef<'_> {
         &self,
         val: &std::option::Option<crate::MyJsonType>,
     ) -> Result<Update, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(2usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&val)?;
         serialized_values.add_value(&self.birthday)?;
         Ok(Update::new(Qv {
@@ -437,7 +437,7 @@ impl PrimaryKeyRef<'_> {
             panic!("Empty update array")
         }
         let mut query = vec![];
-        let mut serialized_values = SerializedValues::with_capacity(val.len() + 1usize);
+        let mut serialized_values = SerializedValues::new();
         for v in val {
             match v {
                 UpdatableColumnRef::EnumJson(v) => {
@@ -483,7 +483,7 @@ impl PrimaryKeyRef<'_> {
 impl PrimaryKeyRef<'_> {
     #[doc = r" Returns a struct that can perform a single row deletion"]
     pub fn delete_qv(&self) -> Result<DeleteUnique, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(1usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.birthday)?;
         Ok(DeleteUnique::new(Qv {
             query: DELETE_QUERY,

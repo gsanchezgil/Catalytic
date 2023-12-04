@@ -181,7 +181,6 @@ impl Parse for Query {
             .iter()
             .filter(|r| r.parameterized)
             .collect::<Vec<_>>();
-        let ident_count = idents.len();
         let types_comparison = idents
             .iter()
             .enumerate()
@@ -203,7 +202,15 @@ impl Parse for Query {
             .collect::<Vec<syn::Type>>();
 
         let serialized_values = quote! {{
-            let mut serialized_values = catalytic::scylla::frame::value::SerializedValues::with_capacity(#ident_count);
+            // https://github.com/Jasperav/Catalytic/issues/11
+            // let mut size = 0;
+            //
+            // #(
+            //   size += std::mem::size_of_val(#idents);
+            // )*
+            //
+            // let mut serialized_values = catalytic::scylla::frame::value::SerializedValues::with_capacity(size);
+            let mut serialized_values = catalytic::scylla::frame::value::SerializedValues::new();
 
             #(
                 // Check if the type is correct

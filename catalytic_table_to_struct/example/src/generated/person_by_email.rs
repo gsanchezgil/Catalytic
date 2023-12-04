@@ -225,7 +225,7 @@ impl From<PrimaryKeyRef<'_>> for PrimaryKey {
 impl PrimaryKeyRef<'_> {
     #[doc = r" Returns a struct that can perform a unique row selection"]
     pub fn select_unique_qv(&self) -> Result<SelectUnique<PersonByEmail>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(3usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.email)?;
         serialized_values.add_value(&self.name)?;
         serialized_values.add_value(&self.age)?;
@@ -252,7 +252,7 @@ impl PrimaryKeyRef<'_> {
     pub fn select_unique_expect_qv(
         &self,
     ) -> Result<SelectUniqueExpect<PersonByEmail>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(3usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.email)?;
         serialized_values.add_value(&self.name)?;
         serialized_values.add_value(&self.age)?;
@@ -279,7 +279,7 @@ impl PrimaryKeyRef<'_> {
     pub fn select_unique_base_table_qv(
         &self,
     ) -> Result<SelectUnique<Person>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(3usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.email)?;
         serialized_values.add_value(&self.name)?;
         serialized_values.add_value(&self.age)?;
@@ -306,7 +306,7 @@ impl PrimaryKeyRef<'_> {
     pub fn select_unique_expect_base_table_qv(
         &self,
     ) -> Result<SelectUniqueExpect<Person>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(3usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.email)?;
         serialized_values.add_value(&self.name)?;
         serialized_values.add_value(&self.age)?;

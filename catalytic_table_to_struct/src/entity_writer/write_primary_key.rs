@@ -30,24 +30,35 @@ pub(crate) fn write<T: Transformer>(
     let mut primary_key_ref_fields = vec![];
     let mut primary_key_to_ref = vec![];
     let mut primary_key_from_ref = vec![];
-    let primary_key_len = entity_writer.struct_field_metadata.primary_key_fields.len();
-    let add_to_serialized_values = entity_writer
+    let ident_field_names = entity_writer
         .struct_field_metadata
         .primary_key_fields
         .iter()
-        .map(|f| {
-            let ident = &f.field_name;
-
+        .map(|f| &f.field_name)
+        .collect::<Vec<_>>();
+    let add_to_serialized_values = ident_field_names
+        .iter()
+        .map(|i| {
             quote! {
-                serialized_values.add_value(&self.#ident)?;
+                serialized_values.add_value(&self.#i)?;
             }
         })
         .collect::<Vec<_>>();
 
     let serialize = quote! {
-        let mut serialized_values = SerializedValues::with_capacity(#primary_key_len);
+        // https://github.com/Jasperav/Catalytic/issues/11
+        // let mut size = 0;
+        //
+        // #(
+        //   size += std::mem::size_of_val(self.#ident_field_names);
+        // )*
+        //
+        // let mut serialized_values = SerializedValues::with_capacity(size);
+        let mut serialized_values = SerializedValues::new();
 
-        #(#add_to_serialized_values)*
+        #(
+            serialized_values.add_value(&self.#ident_field_names)?;
+        )*
     };
 
     for field in &entity_writer.struct_field_metadata.primary_key_fields {
@@ -189,7 +200,6 @@ pub(crate) fn write<T: Transformer>(
                         "update {} set {} = ? {}",
                         table_name, field.column_name, where_clause
                     );
-                    let single_update_len = primary_key_len + 1;
                     let method_name_qv = qv(&method_name);
                     let message_return = format!(
                         "Returns a struct that can perform an update operation for column {}",
@@ -210,7 +220,9 @@ pub(crate) fn write<T: Transformer>(
                     impl #primary_key_struct_ref<'_> {
                         #[doc = #message_return]
                         pub fn #method_name_qv(&self, val: &#ty) -> Result<Update, SerializeValuesError> {
-                            let mut serialized_values = SerializedValues::with_capacity(#single_update_len);
+                            // https://github.com/Jasperav/Catalytic/issues/11
+                            //let mut serialized_values = SerializedValues::with_capacity(std::mem::size_of_val(val));
+                            let mut serialized_values = SerializedValues::new();
 
                             serialized_values.add_value(&val)?;
 
@@ -291,7 +303,10 @@ pub(crate) fn write<T: Transformer>(
                         }
 
                         let mut query = vec![];
-                        let mut serialized_values = SerializedValues::with_capacity(val.len() + #primary_key_len);
+
+                        // Hard to calculate the size in advance, I guess it's not performant to loop over the values
+                        // and calculate the sizes then
+                        let mut serialized_values = SerializedValues::new();
 
                         for v in val {
                             match v {

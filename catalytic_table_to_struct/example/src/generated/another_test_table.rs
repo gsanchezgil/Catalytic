@@ -171,7 +171,7 @@ pub async fn truncate(session: &CachingSession) -> ScyllaQueryResult {
 impl<'a> AnotherTestTableRef<'a> {
     #[doc = r" Returns a struct that can perform an insert operation"]
     pub fn insert_qv(&self) -> Result<Insert, SerializeValuesError> {
-        let mut serialized = SerializedValues::with_capacity(4usize);
+        let mut serialized = SerializedValues::new();
         serialized.add_value(&self.a)?;
         serialized.add_value(&self.b)?;
         serialized.add_value(&self.c)?;
@@ -188,7 +188,7 @@ impl<'a> AnotherTestTableRef<'a> {
     }
     #[doc = r" Returns a struct that can perform an insert operation with a TTL"]
     pub fn insert_ttl_qv(&self, ttl: TtlType) -> Result<Insert, SerializeValuesError> {
-        let mut serialized = SerializedValues::with_capacity(5usize);
+        let mut serialized = SerializedValues::new();
         serialized.add_value(&self.a)?;
         serialized.add_value(&self.b)?;
         serialized.add_value(&self.c)?;
@@ -281,7 +281,7 @@ impl From<PrimaryKeyRef<'_>> for PrimaryKey {
 impl PrimaryKeyRef<'_> {
     #[doc = r" Returns a struct that can perform a unique row selection"]
     pub fn select_unique_qv(&self) -> Result<SelectUnique<AnotherTestTable>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(3usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.a)?;
         serialized_values.add_value(&self.b)?;
         serialized_values.add_value(&self.c)?;
@@ -308,7 +308,7 @@ impl PrimaryKeyRef<'_> {
     pub fn select_unique_expect_qv(
         &self,
     ) -> Result<SelectUniqueExpect<AnotherTestTable>, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(3usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.a)?;
         serialized_values.add_value(&self.b)?;
         serialized_values.add_value(&self.c)?;
@@ -333,7 +333,7 @@ impl PrimaryKeyRef<'_> {
 impl PrimaryKeyRef<'_> {
     #[doc = "Returns a struct that can perform an update operation for column d"]
     pub fn update_d_qv(&self, val: &i32) -> Result<Update, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(4usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&val)?;
         serialized_values.add_value(&self.a)?;
         serialized_values.add_value(&self.b)?;
@@ -383,7 +383,7 @@ impl PrimaryKeyRef<'_> {
             panic!("Empty update array")
         }
         let mut query = vec![];
-        let mut serialized_values = SerializedValues::with_capacity(val.len() + 3usize);
+        let mut serialized_values = SerializedValues::new();
         for v in val {
             match v {
                 UpdatableColumnRef::D(v) => {
@@ -423,7 +423,7 @@ impl PrimaryKeyRef<'_> {
 impl PrimaryKeyRef<'_> {
     #[doc = r" Returns a struct that can perform a single row deletion"]
     pub fn delete_qv(&self) -> Result<DeleteUnique, SerializeValuesError> {
-        let mut serialized_values = SerializedValues::with_capacity(3usize);
+        let mut serialized_values = SerializedValues::new();
         serialized_values.add_value(&self.a)?;
         serialized_values.add_value(&self.b)?;
         serialized_values.add_value(&self.c)?;
